@@ -44,6 +44,18 @@ app.post('/mcp', async (req, res) => {
   }
 });
 
+// Nested /mcp/manifest and /mcp/run paths for IDE compatibility
+app.get('/mcp/manifest', (_, res) => res.json(manifest));
+app.post('/mcp/run', async (req, res) => {
+  try {
+    const result = await runTool(req.body);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ isError: true, content: [err.message] });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`RedTrack MCP server listening on port ${PORT}`);
