@@ -1,6 +1,6 @@
 import express from 'express';
 
-const PROTOCOL_VERSION = '2025-06-18';
+const PROTOCOL_VERSION = '2024-11-05';
 import { manifest } from './manifest.mjs';
 import { runTool } from './redtrack.mjs';
 
