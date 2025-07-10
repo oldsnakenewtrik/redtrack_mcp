@@ -16,7 +16,10 @@ export async function getConversions({ startDate, endDate }) {
   }
   const url = `${BASE}/conversions?startDate=${startDate}&endDate=${endDate}`;
   const rsp = await fetch(url, {
-    headers: { Authorization: `ApiKey ${process.env.REDTRACK_KEY}` }
+    headers: {
+      'Authorization': `Bearer ${process.env.REDTRACK_KEY}`,
+      'Content-Type': 'application/json'
+    }
   });
   if (!rsp.ok) {
     throw new Error(`RedTrack error ${rsp.status}`);
