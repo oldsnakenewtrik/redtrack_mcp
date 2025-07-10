@@ -30,7 +30,12 @@ async function processRequest(body) {
               name: 'redtrack_mcp',
               version: '1.0.0',
               description: 'RedTrack MCP Server for conversion data'
-            }
+            },
+            tools: manifest.tools.map(t => ({
+              name: t.name,
+              description: t.description,
+              inputSchema: t.input_schema
+            }))
           }
         };
       case 'tools/list':
