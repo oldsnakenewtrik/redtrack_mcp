@@ -7,6 +7,15 @@ export const manifest = {
   description: 'Query RedTrack conversions and campaigns',
   tools: [
     {
+      name: 'ping',
+      description: 'Health check. Returns \"pong\".',
+      input_schema: {
+        type: 'object',
+        properties: {},
+        required: []
+      }
+    },
+    {
       name: 'get_conversions',
       description: 'Return a list of conversions between two dates (YYYY-MM-DD)',
       input_schema: {

@@ -31,6 +31,8 @@ export async function getConversions({ startDate, endDate }) {
  */
 export async function runTool({ tool, input }) {
   switch (tool) {
+    case 'ping':
+      return { content: ['pong'] };
     case 'get_conversions':
       return { content: [await getConversions(input)] };
     default:
