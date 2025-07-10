@@ -48,6 +48,9 @@ async function processRequest(body) {
       }
       case 'ping':
         return { jsonrpc: '2.0', id, result: {} };
+      case 'notifications/initialized':
+        // Client indicates initialization is complete - just acknowledge
+        return { jsonrpc: '2.0', id, result: {} };
       // Legacy wrapper for previous style
       case 'run': {
         const tool = body.params?.tool;
