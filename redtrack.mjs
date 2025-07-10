@@ -3,7 +3,7 @@
  * All functions are stateless and rely on environment variable REDTRACK_KEY.
  */
 
-const BASE = 'https://api.redtrack.io/rest/v1';
+const BASE = 'https://api.redtrack.io';
 
 /**
  * Fetch conversions within a date range.
