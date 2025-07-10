@@ -56,6 +56,14 @@ app.get('/mcp', (_, res) => res.json({
 }));
 app.post('/mcp', async (req, res) => {
   try {
+    // If body is empty or missing jsonrpc => return handshake object
+    if (!req.body || !req.body.jsonrpc) {
+      return res.json({
+        protocolVersion: '0.6',
+        capabilities: { supportsStreaming: false },
+        serverInfo: { name: 'redtrack_mcp', version: '1.0.0' }
+      });
+    }
     const result = await processRequest(req.body);
     const envelope = result.jsonrpc ? result : { jsonrpc: '2.0', id: req.body?.id ?? null, result };
     res.json(envelope);
