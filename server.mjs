@@ -53,7 +53,8 @@ app.get('/mcp', (_, res) => res.json(manifest));
 app.post('/mcp', async (req, res) => {
   try {
     const result = await processRequest(req.body);
-    res.json(result);
+    const envelope = result.jsonrpc ? result : { jsonrpc: '2.0', id: req.body?.id ?? null, result };
+    res.json(envelope);
   } catch (err) {
     console.error(err);
     res.status(500).json({ isError: true, content: [err.message] });
@@ -65,7 +66,8 @@ app.get('/mcp/manifest', (_, res) => res.json(manifest));
 app.post('/mcp/run', async (req, res) => {
   try {
     const result = await processRequest(req.body);
-    res.json(result);
+    const envelope = result.jsonrpc ? result : { jsonrpc: '2.0', id: req.body?.id ?? null, result };
+    res.json(envelope);
   } catch (err) {
     console.error(err);
     res.status(500).json({ isError: true, content: [err.message] });
