@@ -103,8 +103,17 @@ app.post('/', async (req, res) => {
 // /mcp alias (e.g., bigquery example)
 app.get('/mcp', (_, res) => res.json({
   protocolVersion: PROTOCOL_VERSION,
-  capabilities: { tools: { listChanged: false } },
-  serverInfo: { name: 'redtrack_mcp', version: '1.0.0' }
+  capabilities: {
+    tools: { listChanged: false },
+    resources: {},
+    prompts: {}
+  },
+  serverInfo: { name: 'redtrack_mcp', version: '1.0.0' },
+  tools: manifest.tools.map(t => ({
+    name: t.name,
+    description: t.description,
+    inputSchema: t.input_schema
+  }))
 }));
 app.post('/mcp', async (req, res) => {
   try {
