@@ -2,6 +2,22 @@ import express from 'express';
 import { manifest } from './manifest.mjs';
 import { runTool } from './redtrack.mjs';
 
+// Helper to support both simple and JSON-RPC 2.0 payloads
+async function processRequest(body) {
+  let tool, input, id = null, isJsonRpc = false;
+  if (body && body.jsonrpc === '2.0' && body.method === 'run') {
+    isJsonRpc = true;
+    id = body.id ?? null;
+    tool = body.params?.tool;
+    input = body.params?.input;
+  } else {
+    tool = body.tool;
+    input = body.input;
+  }
+  const result = await runTool({ tool, input });
+  return isJsonRpc ? { jsonrpc: '2.0', id, result } : result;
+}
+
 const app = express();
 app.use(express.json());
 
@@ -12,7 +28,7 @@ app.get('/manifest', (_, res) => {
 
 app.post('/run', async (req, res) => {
   try {
-    const result = await runTool(req.body);
+    const result = await processRequest(req.body);
     res.json(result);
   } catch (err) {
     console.error(err);
@@ -24,7 +40,7 @@ app.post('/run', async (req, res) => {
 app.get('/', (_, res) => res.json(manifest));
 app.post('/', async (req, res) => {
   try {
-    const result = await runTool(req.body);
+    const result = await processRequest(req.body);
     res.json(result);
   } catch (err) {
     console.error(err);
@@ -36,7 +52,7 @@ app.post('/', async (req, res) => {
 app.get('/mcp', (_, res) => res.json(manifest));
 app.post('/mcp', async (req, res) => {
   try {
-    const result = await runTool(req.body);
+    const result = await processRequest(req.body);
     res.json(result);
   } catch (err) {
     console.error(err);
@@ -48,7 +64,7 @@ app.post('/mcp', async (req, res) => {
 app.get('/mcp/manifest', (_, res) => res.json(manifest));
 app.post('/mcp/run', async (req, res) => {
   try {
-    const result = await runTool(req.body);
+    const result = await processRequest(req.body);
     res.json(result);
   } catch (err) {
     console.error(err);
