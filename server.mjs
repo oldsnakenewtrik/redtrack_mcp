@@ -119,9 +119,11 @@ app.get('/mcp', (_, res) => res.json({
 }));
 app.post('/mcp', async (req, res) => {
   try {
+    console.log('POST /mcp received:', JSON.stringify(req.body, null, 2));
+
     // If body is empty or missing jsonrpc => return handshake object
     if (!req.body || !req.body.jsonrpc) {
-      return res.json({
+      const response = {
         protocolVersion: PROTOCOL_VERSION,
         capabilities: {
           tools: { listChanged: false },
@@ -129,17 +131,23 @@ app.post('/mcp', async (req, res) => {
           prompts: {}
         },
         serverInfo: { name: 'redtrack_mcp', version: '1.0.0' }
-      });
+      };
+      console.log('Returning handshake:', JSON.stringify(response, null, 2));
+      return res.json(response);
     }
+
     const result = await processRequest(req.body);
+    console.log('Returning result:', JSON.stringify(result, null, 2));
     res.json(result);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
+    console.error('Error in /mcp:', err);
+    const errorResponse = {
       jsonrpc: '2.0',
       id: req.body?.id ?? null,
       error: { code: -32603, message: err.message }
-    });
+    };
+    console.log('Returning error:', JSON.stringify(errorResponse, null, 2));
+    res.status(500).json(errorResponse);
   }
 });
 
