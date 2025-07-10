@@ -30,6 +30,9 @@ export async function getConversions({ startDate, endDate }) {
  * @returns {Promise<{content:any,isError?:boolean}>}
  */
 export async function runTool({ tool, input }) {
+  if (!tool) {
+    return { content: ['pong'] };
+  }
   switch (tool) {
     case 'ping':
       return { content: ['pong'] };
