@@ -49,7 +49,11 @@ app.post('/', async (req, res) => {
 });
 
 // /mcp alias (e.g., bigquery example)
-app.get('/mcp', (_, res) => res.json(manifest));
+app.get('/mcp', (_, res) => res.json({
+  protocolVersion: '0.6',
+  capabilities: { supportsStreaming: false },
+  serverInfo: { name: 'redtrack_mcp', version: '1.0.0' }
+}));
 app.post('/mcp', async (req, res) => {
   try {
     const result = await processRequest(req.body);
