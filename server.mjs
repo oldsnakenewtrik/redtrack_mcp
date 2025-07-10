@@ -18,11 +18,19 @@ async function processRequest(body) {
           result: {
             protocolVersion: PROTOCOL_VERSION,
             capabilities: {
-              tools: { listChanged: false },
+              tools: {
+                listChanged: false,
+                supportsProgress: false
+              },
               resources: {},
-              prompts: {}
+              prompts: {},
+              logging: {}
             },
-            serverInfo: { name: 'redtrack_mcp', version: '1.0.0' }
+            serverInfo: {
+              name: 'redtrack_mcp',
+              version: '1.0.0',
+              description: 'RedTrack MCP Server for conversion data'
+            }
           }
         };
       case 'tools/list':
@@ -52,6 +60,7 @@ async function processRequest(body) {
         return { jsonrpc: '2.0', id, result: {} };
       case 'notifications/initialized':
         // Client indicates initialization is complete - just acknowledge
+        console.log('Client initialized - tools should now be available');
         return { jsonrpc: '2.0', id, result: {} };
       // Legacy wrapper for previous style
       case 'run': {
