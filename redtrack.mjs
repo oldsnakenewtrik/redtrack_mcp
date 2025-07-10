@@ -14,10 +14,9 @@ export async function getConversions({ startDate, endDate }) {
   if (!process.env.REDTRACK_KEY) {
     throw new Error('REDTRACK_KEY env var not set');
   }
-  const url = `${BASE}/conversions?startDate=${startDate}&endDate=${endDate}`;
+  const url = `${BASE}/conversions?startDate=${startDate}&endDate=${endDate}&api_key=${process.env.REDTRACK_KEY}`;
   const rsp = await fetch(url, {
     headers: {
-      'Authorization': `Bearer ${process.env.REDTRACK_KEY}`,
       'Content-Type': 'application/json'
     }
   });
