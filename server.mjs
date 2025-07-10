@@ -30,8 +30,7 @@ async function processRequest(body) {
             tools: manifest.tools.map(t => ({
               name: t.name,
               description: t.description,
-              inputSchema: t.input_schema,
-              annotations: { title: t.name }
+              inputSchema: t.input_schema
             }))
           }
         };
@@ -121,16 +120,23 @@ app.post('/mcp', async (req, res) => {
     if (!req.body || !req.body.jsonrpc) {
       return res.json({
         protocolVersion: PROTOCOL_VERSION,
-        capabilities: { tools: { listChanged: false } },
+        capabilities: {
+          tools: { listChanged: false },
+          resources: {},
+          prompts: {}
+        },
         serverInfo: { name: 'redtrack_mcp', version: '1.0.0' }
       });
     }
     const result = await processRequest(req.body);
-    const envelope = result.jsonrpc ? result : { jsonrpc: '2.0', id: req.body?.id ?? null, result };
-    res.json(envelope);
+    res.json(result);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ isError: true, content: [err.message] });
+    res.status(500).json({
+      jsonrpc: '2.0',
+      id: req.body?.id ?? null,
+      error: { code: -32603, message: err.message }
+    });
   }
 });
 
