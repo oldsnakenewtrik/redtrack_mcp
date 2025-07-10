@@ -26,6 +26,18 @@ export const manifest = {
         },
         required: ['startDate', 'endDate']
       }
+    },
+    {
+      name: 'get_campaigns',
+      description: 'Return all campaigns (optionally filtered by date_from / date_to). Handles pagination internally.',
+      input_schema: {
+        type: 'object',
+        properties: {
+          date_from: { type: 'string', format: 'date', description: 'optional start date' },
+          date_to:   { type: 'string', format: 'date', description: 'optional end date' }
+        },
+        required: []
+      }
     }
   ]
 };
