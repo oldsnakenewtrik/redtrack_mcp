@@ -17,9 +17,12 @@ async function processRequest(body) {
           id,
           result: {
             protocolVersion: PROTOCOL_VERSION,
-            capabilities: { tools: { listChanged: false } },
-            serverInfo: { name: 'redtrack_mcp', version: '1.0.0' },
-            instructions: 'Call tools/list then tools/call("get_conversions", …)'
+            capabilities: {
+              tools: { listChanged: false },
+              resources: {},
+              prompts: {}
+            },
+            serverInfo: { name: 'redtrack_mcp', version: '1.0.0' }
           }
         };
       case 'tools/list':
