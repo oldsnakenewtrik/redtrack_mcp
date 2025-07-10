@@ -1,21 +1,70 @@
 import express from 'express';
+
+const PROTOCOL_VERSION = '2025-06-18';
 import { manifest } from './manifest.mjs';
 import { runTool } from './redtrack.mjs';
 
 // Helper to support both simple and JSON-RPC 2.0 payloads
+// Full JSON-RPC + legacy processing
 async function processRequest(body) {
-  let tool, input, id = null, isJsonRpc = false;
-  if (body && body.jsonrpc === '2.0' && body.method === 'run') {
-    isJsonRpc = true;
-    id = body.id ?? null;
-    tool = body.params?.tool;
-    input = body.params?.input;
-  } else {
-    tool = body.tool;
-    input = body.input;
+    // If it's a JSON-RPC 2.0 payload
+  if (body && body.jsonrpc === '2.0') {
+    const id = body.id ?? null;
+    switch (body.method) {
+      case 'initialize':
+        return {
+          jsonrpc: '2.0',
+          id,
+          result: {
+            protocolVersion: PROTOCOL_VERSION,
+            capabilities: { tools: { listChanged: false } },
+            serverInfo: { name: 'redtrack_mcp', version: '1.0.0' },
+            instructions: 'Call tools/list then tools/call("get_conversions", …)'
+          }
+        };
+      case 'tools/list':
+        return {
+          jsonrpc: '2.0',
+          id,
+          result: {
+            tools: manifest.tools.map(t => ({
+              name: t.name,
+              description: t.description,
+              inputSchema: t.input_schema,
+              annotations: { title: t.name }
+            }))
+          }
+        };
+      case 'tools/call': {
+        const { name, arguments: args = {} } = body.params ?? {};
+        const { content } = await runTool({ tool: name, input: args });
+        return {
+          jsonrpc: '2.0',
+          id,
+          result: {
+            content: (content || []).map(txt => ({ type: 'text', text: typeof txt === 'string' ? txt : JSON.stringify(txt) }))
+          }
+        };
+      }
+      case 'ping':
+        return { jsonrpc: '2.0', id, result: {} };
+      // Legacy wrapper for previous style
+      case 'run': {
+        const tool = body.params?.tool;
+        const input = body.params?.input;
+        const { content } = await runTool({ tool, input });
+        return { jsonrpc: '2.0', id, result: { content } };
+      }
+      default:
+        throw new Error(`Unrecognised JSON-RPC method: ${body.method}`);
+    }
   }
+
+  // Non-JSON-RPC: simple payload { tool, input }
+  const tool = body?.tool;
+  const input = body?.input;
   const result = await runTool({ tool, input });
-  return isJsonRpc ? { jsonrpc: '2.0', id, result } : result;
+  return result;
 }
 
 const app = express();
@@ -50,8 +99,8 @@ app.post('/', async (req, res) => {
 
 // /mcp alias (e.g., bigquery example)
 app.get('/mcp', (_, res) => res.json({
-  protocolVersion: '0.6',
-  capabilities: { supportsStreaming: false },
+  protocolVersion: PROTOCOL_VERSION,
+  capabilities: { tools: { listChanged: false } },
   serverInfo: { name: 'redtrack_mcp', version: '1.0.0' }
 }));
 app.post('/mcp', async (req, res) => {
@@ -59,8 +108,8 @@ app.post('/mcp', async (req, res) => {
     // If body is empty or missing jsonrpc => return handshake object
     if (!req.body || !req.body.jsonrpc) {
       return res.json({
-        protocolVersion: '0.6',
-        capabilities: { supportsStreaming: false },
+        protocolVersion: PROTOCOL_VERSION,
+        capabilities: { tools: { listChanged: false } },
         serverInfo: { name: 'redtrack_mcp', version: '1.0.0' }
       });
     }
