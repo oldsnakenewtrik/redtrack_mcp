@@ -1,0 +1,13 @@
+{
+  "$schema": "https://gofastmcp.com/public/schemas/fastmcp.json/v1.json",
+  "source": { "path": "mcp_server.py", "entrypoint": "mcp" },
+  "environment": { "python": ">=3.10", "dependencies": ["fastmcp", "httpx"] },
+  "deployment": {
+    "transport": "stdio",
+    "env": {
+      "REDTRACK_API_KEY": "${REDTRACK_API_KEY}",
+      "REDTRACK_BASE_URL": "${REDTRACK_BASE_URL}"
+    }
+  }
+}
+
