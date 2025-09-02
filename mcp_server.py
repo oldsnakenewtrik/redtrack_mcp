@@ -71,9 +71,13 @@ class RedTrackClient:
                     detail = resp.text
                 raise RuntimeError(f"RedTrack GET {path} failed: {resp.status_code} {detail}") from e
             try:
-                return resp.json()  # type: ignore[return-value]
+                data = resp.json()
             except Exception:
                 return {"status": resp.status_code, "text": resp.text}
+            # FastMCP tools must return a dict; wrap list responses
+            if isinstance(data, list):
+                return {"items": data, "count": len(data)}
+            return data
 
 
 mcp = FastMCP("RedTrack MCP Server")
