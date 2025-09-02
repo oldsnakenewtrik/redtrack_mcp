@@ -19,23 +19,13 @@ async function processRequest(body) {
             protocolVersion: PROTOCOL_VERSION,
             capabilities: {
               tools: {
-                listChanged: false,
-                supportsProgress: false
-              },
-              resources: {},
-              prompts: {},
-              logging: {}
+                listChanged: false
+              }
             },
             serverInfo: {
               name: 'redtrack_mcp',
-              version: '1.0.0',
-              description: 'RedTrack MCP Server for conversion data'
-            },
-            tools: manifest.tools.map(t => ({
-              name: t.name,
-              description: t.description,
-              inputSchema: t.input_schema
-            }))
+              version: '1.0.0'
+            }
           }
         };
       case 'tools/list':
