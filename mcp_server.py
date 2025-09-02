@@ -164,19 +164,21 @@ def redtrack_report(
     date_from: str,
     date_to: str,
     group_by: Optional[str] = None,
-    filters: Optional[Dict[str, Any]] = None,
+    campaign_id: Optional[str] = None,
+    source_id: Optional[str] = None,
+    offer_id: Optional[str] = None,
+    time_interval: Optional[str] = None,
     page: int = 1,
     per: int = 1000,
+    filters: Optional[Dict[str, Any]] = None,
     api_key: Optional[str] = None,
     base_url: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Call RedTrack /report endpoint.
 
-    Notes:
-    - The report API supports many parameters depending on dimensions/metrics.
-      This tool forwards a simple set: date range, group_by, page/per, and any extra filters.
-    - Pass additional query params via `filters` dict (e.g., {"campaign_id": "..."}).
+    You can pass common filters directly (campaign_id, source_id, offer_id, time_interval),
+    or provide any additional query params via `filters`.
     """
     _validate_date(date_from, "date_from")
     _validate_date(date_to, "date_to")
@@ -188,6 +190,10 @@ def redtrack_report(
         "group_by": group_by,
         "page": page,
         "per": per,
+        "campaign_id": campaign_id,
+        "source_id": source_id,
+        "offer_id": offer_id,
+        "time_interval": time_interval,
     }
     if filters:
         params.update(filters)
